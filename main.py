@@ -40,6 +40,25 @@ def reset_plan():
     plans.clear()
     current_plan_index = -1
     return "Planes reiniciados."
+    
+# Ruta para eliminar un plan específico por nombre
+@app.route("/removeplan")
+def remove_specific_plan():
+    global current_plan_index
+    plan_to_remove = request.args.get("plan", "").strip().lower()
+
+    for i, plan in enumerate(plans):
+        if plan.lower() == plan_to_remove:
+            removed_plan = plans.pop(i)
+            # Ajustar el índice actual si es necesario
+            if current_plan_index == i:
+                current_plan_index = -1
+            elif current_plan_index > i:
+                current_plan_index -= 1
+            return f"Plan removido: {removed_plan}"
+    
+    return "Plan no encontrado."
+
 
 
 # Ruta para obtener el mensaje de los planes en formato bonito
