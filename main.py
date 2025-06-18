@@ -18,7 +18,7 @@ def add_plan():
     if new_plans:
         items = [item.strip() for item in new_plans.split(",") if item.strip()]
         plans.extend(items)
-    return "Planes añadidos."
+    return f"Planes añadidos nephuJammies @{user}"
 
 
 # Ruta para establecer un plan como "En pantalla"
@@ -29,8 +29,8 @@ def set_plan():
     for i, plan in enumerate(plans):
         if plan.lower() == plan_to_set:
             current_plan_index = i
-            return f"Plan '{plans[i]}' establecido como En pantalla."
-    return "Plan no encontrado."
+            return f"'{plans[i]}' En pantalla nephuo7 @{user}"
+    return f"Plan no encontrado nephuThink @{user}"
 
 
 # Ruta para resetear todos los planes
@@ -39,7 +39,7 @@ def reset_plan():
     global plans, current_plan_index
     plans.clear()
     current_plan_index = -1
-    return "Planes reiniciados."
+    return f"Planes reiniciados nephuComfy @{user}"
     
 # Ruta para eliminar un plan específico por nombre
 @app.route("/removeplan")
@@ -57,7 +57,7 @@ def remove_specific_plan():
                 current_plan_index -= 1
             return f"Plan removido: {removed_plan}"
     
-    return "Plan no encontrado."
+    return f"Plan no encontrado. @{user}"
 
 
 
@@ -114,13 +114,13 @@ def remove_call():
     if removed:
         return f"Participantes removidos: {' , '.join(removed)}"
     else:
-        return "No se encontraron participantes para remover."
+        return f"No se encontraron participantes para remover @{user}"
 
 
 @app.route("/resetcall", methods=['GET'])
 def reset_call():
     call_participants.clear()
-    return f"!call reiniciado nephuComfy"
+    return f"!call reiniciado nephuComfy @{user}"
 
 
 @app.route("/call", methods=['GET'])
