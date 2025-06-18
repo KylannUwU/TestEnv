@@ -9,7 +9,6 @@ current_plan_index = -1  # Índice del plan actual "En pantalla"
 call_participants = []  # Participantes de la llamada (pares de nombre y emote)
 DEFAULT_CALL = {"name": "Solita", "emote": "nephuLurk"}  # Valor por defecto para la llamada
 
-
 # Ruta para agregar uno o varios planes (separados por coma)
 @app.route("/addplan")
 def add_plan():
