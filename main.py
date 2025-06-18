@@ -18,7 +18,7 @@ def add_plan():
     if new_plans:
         items = [item.strip() for item in new_plans.split(",") if item.strip()]
         plans.extend(items)
-    return f"Planes añadidos nephuJammies @{user}"
+    return "Planes añadidos nephuJammies"
 
 
 # Ruta para establecer un plan como "En pantalla"
@@ -30,7 +30,7 @@ def set_plan():
         if plan.lower() == plan_to_set:
             current_plan_index = i
             return f"'{plans[i]}' En pantalla nephuo7 @{user}"
-    return f"Plan no encontrado nephuThink @{user}"
+    return "Plan no encontrado nephuThink"
 
 
 # Ruta para resetear todos los planes
@@ -39,7 +39,7 @@ def reset_plan():
     global plans, current_plan_index
     plans.clear()
     current_plan_index = -1
-    return f"Planes reiniciados nephuComfy @{user}"
+    return "Planes reiniciados nephuComfy"
     
 # Ruta para eliminar un plan específico por nombre
 @app.route("/removeplan")
