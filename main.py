@@ -28,7 +28,7 @@ def set_plan():
     for i, plan in enumerate(plans):
         if plan.lower() == plan_to_set:
             current_plan_index = i
-            return f"'{plans[i]}' En pantalla nephuo7 @{user}"
+            return f"'{plans[i]}' En pantalla nephuo7"
     return "Plan no encontrado nephuThink"
 
 
