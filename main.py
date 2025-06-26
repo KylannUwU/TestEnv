@@ -5,9 +5,8 @@ app = Flask(__name__)
 
 plans = []  # Lista dinámica de planes
 current_plan_index = -1  # Índice del plan actual "En pantalla"
-call_participants = []  # Participantes de la llamada
-DEFAULT_CALL = {"name": "Solita", "emote": "nephuLurk"}  # Llamada por defecto
-
+call_participants = []  # Lista para almacenar los participantes de la llamada (pares de nombre y emote)
+DEFAULT_CALL = {"name": "Solita", "emote": "nephuLurk"}  # Valor predeterminado para la llamada
 
 @app.route("/addplan")
 def add_plan():
@@ -145,7 +144,6 @@ def add_call():
 
     return f"Participantes añadidos: {' , '.join([f'{name} {emote}' for name, emote in zip(entries[::2], entries[1::2])])}"
 
-
 @app.route("/removecall", methods=['GET'])
 def remove_call():
     names = request.args.get("entries", "").split()
@@ -167,23 +165,25 @@ def remove_call():
         return "No se encontraron participantes para remover."
 
 
+
+# Ruta para resetear la llamada
 @app.route("/resetcall", methods=['GET'])
 def reset_call():
     call_participants.clear()
     return f"!call reiniciado nephuComfy"
 
-
+# Ruta para obtener la información de la llamada
 @app.route("/call", methods=['GET'])
 def get_call():
     if not call_participants:
         return f"{DEFAULT_CALL['name']} {DEFAULT_CALL['emote']}"
-
+    
     call_info = " ".join([f"{p['name']} {p['emote']}" for p in call_participants])
     return call_info
 
 
 if __name__ == "__main__":
+    # Solo para desarrollo local
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
-
