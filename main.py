@@ -1,12 +1,40 @@
 from flask import Flask, request
 import os
+import json
 
 app = Flask(__name__)
 
-plans = []  # Lista dinámica de planes
-current_plan_index = -1  # Índice del plan actual "En pantalla"
-call_participants = []  # Lista para almacenar los participantes de la llamada (pares de nombre y emote)
-DEFAULT_CALL = {"name": "Solita", "emote": "nephuLurk"}  # Valor predeterminado para la llamada
+# ---------- Archivo de persistencia ----------
+DATA_FILE = "data.json"
+
+plans = []
+current_plan_index = -1
+call_participants = []
+
+DEFAULT_CALL = {"name": "Solita", "emote": "nephuLurk"}
+
+def save_data():
+    with open(DATA_FILE, "w") as f:
+        json.dump({
+            "plans": plans,
+            "current_plan_index": current_plan_index,
+            "call_participants": call_participants
+        }, f)
+
+def load_data():
+    global plans, current_plan_index, call_participants
+    try:
+        with open(DATA_FILE, "r") as f:
+            data = json.load(f)
+            plans = data.get("plans", [])
+            current_plan_index = data.get("current_plan_index", -1)
+            call_participants = data.get("call_participants", [])
+    except FileNotFoundError:
+        plans = []
+        current_plan_index = -1
+        call_participants = []
+
+# ---------- Planes ----------
 
 @app.route("/addplan")
 def add_plan():
@@ -18,8 +46,6 @@ def add_plan():
         return "No se recibieron planes."
 
     items = [item.strip() for item in raw_input.split(",") if item.strip()]
-    set_flag = False
-    insert_pos = None
     cleaned_items = []
 
     for item in items:
@@ -45,13 +71,11 @@ def add_plan():
         insert_index = max(0, min(insert_index, len(plans)))
         plans.insert(insert_index, plan)
 
-        if do_set:
-            current_plan_index = insert_index
-        elif set_flag and index == 0:
+        if do_set or current_plan_index == -1:
             current_plan_index = insert_index
 
+    save_data()
     return f"Planes añadidos: {', '.join([p[0] for p in cleaned_items])}"
-
 
 @app.route("/removeplan")
 def remove_specific_plans():
@@ -77,11 +101,12 @@ def remove_specific_plans():
         else:
             i += 1
 
+    save_data()
+
     if removed_plans:
         return f"Planes removidos: {', '.join(removed_plans)}"
     else:
         return "Plan no existente nephuThink"
-
 
 @app.route("/setplan")
 def set_plan():
@@ -90,9 +115,9 @@ def set_plan():
     for i, plan in enumerate(plans):
         if plan.lower() == plan_to_set:
             current_plan_index = i
+            save_data()
             return f"'{plans[i]}' En pantalla nephuo7"
     return "Plan no encontrado nephuThink"
-
 
 @app.route("/nextplan")
 def next_plan():
@@ -103,16 +128,16 @@ def next_plan():
         return "Ya estás en el último plan nephuThink"
     else:
         current_plan_index += 1
+        save_data()
         return f"Siguiente plan: {plans[current_plan_index]} [En pantalla] nephuo7"
-
 
 @app.route("/resetplan")
 def reset_plan():
     global plans, current_plan_index
     plans.clear()
     current_plan_index = -1
+    save_data()
     return "Planes reiniciados nephuComfy"
-
 
 @app.route("/plan")
 def get_plan():
@@ -130,6 +155,7 @@ def get_plan():
     dynamic_part = " ➜ ".join(parts) + " ➜ " if parts else ""
     return f"nephuPats Plan nephuUwu  [ Plan de Hoy ] ➜ {dynamic_part}Mucho Más! nephuPls @{user}"
 
+# ---------- Llamada ----------
 
 @app.route("/addcall", methods=['GET'])
 def add_call():
@@ -142,6 +168,7 @@ def add_call():
         emote = entries[i + 1]
         call_participants.append({"name": name , "emote": emote})
 
+    save_data()
     return f"Participantes añadidos: {' , '.join([f'{name} {emote}' for name, emote in zip(entries[::2], entries[1::2])])}"
 
 @app.route("/removecall", methods=['GET'])
@@ -156,6 +183,8 @@ def remove_call():
                 call_participants.remove(participant)
                 removed.append(f"{participant['name']} {participant['emote']}")
 
+    save_data()
+
     if not call_participants:
         return f"{DEFAULT_CALL['name']} {DEFAULT_CALL['emote']}" 
 
@@ -164,15 +193,12 @@ def remove_call():
     else:
         return "No se encontraron participantes para remover."
 
-
-
-# Ruta para resetear la llamada
 @app.route("/resetcall", methods=['GET'])
 def reset_call():
     call_participants.clear()
+    save_data()
     return f"!call reiniciado nephuComfy"
 
-# Ruta para obtener la información de la llamada
 @app.route("/call", methods=['GET'])
 def get_call():
     if not call_participants:
@@ -181,9 +207,9 @@ def get_call():
     call_info = " ".join([f"{p['name']} {p['emote']}" for p in call_participants])
     return call_info
 
+# ---------- Arranque ----------
 
 if __name__ == "__main__":
-    # Solo para desarrollo local
-    import os
+    load_data()
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
